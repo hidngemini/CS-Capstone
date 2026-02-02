@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Palettes</title>
+    </head>
+    <body>
+        <h1>Palette Generator</h1>
+        <a href="/">back</a>
+
+        <form action="/paletteSubmit" method="POST">
+            <input type="color" id="colour" name="colour" value=<%=colour ? colour : "#ff0000"%> required>
+            <button type="submit">Submit</button>
+        </form>
+
+        <% if (colour) { %>
+            <p>You chose <%= colour %></p>
+        <% } %>
+    </body>
+</html> 
+
