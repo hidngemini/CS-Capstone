@@ -1,10 +1,18 @@
 const express = require('express');
 const app = express();
+const dbInterface = require('./db/dbInterface.js')
 
 app.set('view engine', 'ejs'); // set ejs as view engine
 
 // initialize form data thingy
 app.use(express.urlencoded({ extended: true }));
+
+// initalize db interface
+var db = new dbInterface.DB('db/colourdb.db', 'db/colours_schema.sql')
+
+// #####################
+// #     HOME PAGE     #
+// #####################
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -22,6 +30,7 @@ app.get('/palettes', (req, res) => {
 // Palette submission post request
 app.post('/paletteSubmit', (req, res) => {
   const colour = req.body.colour;
+  db.insertColour(colour);
   res.render('palettes', { colour: colour });
 });
 
