@@ -8,7 +8,7 @@ app.set('view engine', 'ejs'); // set ejs as view engine
 app.use(express.urlencoded({ extended: true }));
 
 // initalize db interface
-var db = new dbInterface.DB('db/colourdb.db', 'db/colours_schema.sql')
+var db = new dbInterface.DB('db/db.db', 'db/db_schema.sql')
 
 // #####################
 // #     HOME PAGE     #
@@ -22,16 +22,46 @@ app.get('/', (req, res) => {
 // #   PALETTE PAGE   #
 // ####################
 
-// Palette page post request
+// Palette page get request
 app.get('/palettes', (req, res) => {
   res.render('palettes', { colour: null });
 });
 
 // Palette submission post request
 app.post('/paletteSubmit', (req, res) => {
+  //TODO: This is currently just doing colours. Update this for full palettes
+
+  // unpack request
   const colour = req.body.colour;
+
+  // insert into db
   db.insertColour(colour);
+
+  // render page with request details
   res.render('palettes', { colour: colour });
+});
+
+// #####################
+// #   GRADIENT PAGE   #
+// #####################
+
+// Gradients page get request
+app.get('/gradients', (req, res) => {
+  res.render('gradients', { numBlocks: null, fromColour: "#000000", toColour: "#ffffff"});
+});
+
+// Gradients page post request
+app.post('/gradientSubmit', (req, res) => {
+  // unpack request
+  const numBlocks = req.body.numBlocks;
+  const fromColour = req.body.fromColour;
+  const toColour = req.body.toColour;
+
+  // insert into db
+  db.insertGradient(numBlocks, fromColour, toColour);
+
+  // render page with request details
+  res.render('gradients', { numBlocks: numBlocks, fromColour: fromColour, toColour: toColour });
 });
 
 // Run server on port 3000

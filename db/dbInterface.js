@@ -12,12 +12,44 @@ class DB {
         }
     }
 
-    insertColour(hexString) {
-        console.log(`inserting ${hexString}`)
+    convertColour(hexStr) {
+        return Number("0x" + hexStr.substring(1));
+    }
 
-        var formattedString = "0x" + hexString.substring(1);
-        const insertColourString = this.#db.prepare('INSERT INTO Colour (hex) VALUES (?);');
-        insertColourString.run(Number(formattedString));
+    // this method won't be used. It is a very basic example of how to query the db.
+    insertColour(hexStr, debug=false) {
+        // print stuff if debugging
+        if (debug) {
+            console.log(`inserting ${hexStr}`);
+        }
+
+        // setup sql query
+        const insertColourString = this.#db.prepare('INSERT INTO Colour (dateCreated, hex) VALUES (?, ?);');
+
+        // value calculations
+        var date = Date.now();
+        var colourInt = this.convertColour(hexStr);
+
+        // insert after converting
+        insertColourString.run(date, colourInt);
+    }
+
+    insertGradient(numBlocks, fromHexStr, toHexStr, debug=false) {
+        // print stuff if debugging
+        if (debug) {
+            console.log(`inserting gradient with ${numBlocks} blocks from ${fromHexStr} to ${toHexStr}`);
+        }
+
+        // prepare sql query
+        const insertGradientString = this.#db.prepare(`INSERT INTO Gradient
+            (dateCreated,numBlocks,fromHex,toHex) VALUES (?,?,?,?)`);
+        
+        var date = Date.now();
+        var fromHex = this.convertColour(fromHexStr);
+        var toHex = this.convertColour(toHexStr);
+
+        // insert after computing
+        insertGradientString.run(date, numBlocks, fromHex, toHex);
     }
 
     close() {

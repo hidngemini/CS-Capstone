@@ -6,32 +6,44 @@ drop TABLE if EXISTS Curve;
 drop TABLE if EXISTS Gradient;
 drop TABLE if EXISTS Palette;
 
+-- purely for testing purposes; #TODO: REMOVE THIS EVENTUALLY
+drop TABLE if EXISTS Colour;
+CREATE TABLE "Colour" (
+	"colourId" INTEGER NOT NULL,
+	"dateCreated"  INTEGER NOT NULL,
+    "hex" INTEGER NOT NULL,
+	PRIMARY KEY(colourId)
+);
+
 -- curve table
 CREATE TABLE "Curve" (
-	"id"	INTEGER,
-    "date_created"  INTEGER,
-	"P1_x"	REAL,
-	"P1_y"	REAL,
-	"P2_x"	REAL,
-	"P2_y"	REAL,
-	"P3_x"	REAL,
-	"P3_y"	REAL,
-	"P4_x"	REAL,
-	"P4_y"	REAL
+	"curveId"	INTEGER NOT NULL,
+    "dateCreated"  INTEGER NOT NULL,
+	"P1_x"	REAL NOT NULL,
+	"P1_y"	REAL NOT NULL,
+	"P2_x"	REAL NOT NULL,
+	"P2_y"	REAL NOT NULL,
+	"P3_x"	REAL NOT NULL,
+	"P3_y"	REAL NOT NULL,
+	"P4_x"	REAL NOT NULL,
+	"P4_y"	REAL NOT NULL,
+	PRIMARY KEY (curveId)
 );
 
 -- gradient table
 CREATE TABLE "Gradient" (
-	"id"	INTEGER,
-    "date_created"  INTEGER,
-	"numBlocks"	INTEGER,
-	"fromHex"	INTEGER,
-	"toHex"	INTEGER
+	"gradId"	INTEGER NOT NULL,
+    "dateCreated"  INTEGER NOT NULL,
+	"numBlocks"	INTEGER NOT NULL,
+	"fromHex"	INTEGER NOT NULL,
+	"toHex"	INTEGER NOT NULL,
+	PRIMARY KEY (gradId)
 );
 
 -- palette table
 CREATE TABLE "Palette" (
-	"id"	INTEGER,
-    "date_created"  INTEGER,
-	"block_ids"	TEXT
+	"paletteId"	INTEGER NOT NULL,
+    "dateCreated"  INTEGER NOT NULL,
+	"blockData"	TEXT NOT NULL,
+	PRIMARY KEY (paletteId)
 );
