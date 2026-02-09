@@ -5,6 +5,7 @@ PRAGMA foreign_keys = ON;
 drop TABLE if EXISTS Curve;
 drop TABLE if EXISTS Gradient;
 drop TABLE if EXISTS Palette;
+drop TABLE if EXISTS Texture;
 
 -- purely for testing purposes; #TODO: REMOVE THIS EVENTUALLY
 drop TABLE if EXISTS Colour;
@@ -47,3 +48,12 @@ CREATE TABLE "Palette" (
 	"blockData"	TEXT NOT NULL,
 	PRIMARY KEY (paletteId)
 );
+
+-- textures table
+CREATE TABLE "Texture" (
+	"textureId" INTEGER NOT NULL, 
+	"texture" BLOB NOT NULL,
+	"avgColour" INTEGER NOT NULL,
+	"direction" INTEGER NOT NULL,
+	PRIMARY KEY (textureId)
+)

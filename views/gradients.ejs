@@ -8,7 +8,7 @@
         <a href="/">back</a>
 
         <form action="/gradientSubmit" method="POST">
-            <div id="rectangle" style="width:300px; height:30px; background-image:linear-gradient(to right, <%=fromColour%>, <%=toColour%>)"></div>
+            <div id="rectangle" style="width:30%; height:30px; background-image:linear-gradient(to right, <%=fromColour%>, <%=toColour%>)"></div>
             <input type="number" id="numBlocks" name="numBlocks" value="3" min="3" max="30" />
             <input type="color" id="fromColour" name="fromColour" value=<%=fromColour ? fromColour : "#ff0000"%> required>
             <input type="color" id="toColour" name="toColour" value=<%=toColour ? toColour : "#ffffff"%> required>

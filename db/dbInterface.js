@@ -52,6 +52,22 @@ class DB {
         insertGradientString.run(date, numBlocks, fromHex, toHex);
     }
 
+    insertTexture(textureBlob, hexStr, direction, debug=false) {
+        // print stuff if debugging
+        if (debug) {
+            console.log(`inserting texture with colour: ${hexStr}`);
+        }
+
+        // prepare sql query
+        const insertTextureString = this.#db.prepare(`INSERT INTO Texture
+            (texture, avgColour, direction) VALUES (?,?,?)`);
+
+        var texture = textureBlob;
+        var colourHex = this.convertColour(hexStr);
+
+        insertTextureString.run(texture, colourHex, direction);
+    }
+
     close() {
         this.#db.close()
     }

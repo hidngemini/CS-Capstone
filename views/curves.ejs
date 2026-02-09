@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Curves</title>
+    </head>
+    <body>
+        <h1>Curve Generator</h1>
+        <a href="/">back</a>
+
+        <form action="/curveSubmit" method="POST">
+            <a>grid size: </a>
+            <input type="number" id="size" name="size" value=<%=size ? size : "10"%> min="10" max="100" required>
+            <br>
+            <a>p0: </a>
+            <input type="number" id="p0x" name="p0x" value="0" step="0.001" required>
+            <input type="number" id="p0y" name="p0y" value="0" step="0.001" required>
+            <br>
+            <a>p1: </a>
+            <input type="number" id="p1x" name="p1x" value="0" step="0.001" required>
+            <input type="number" id="p1y" name="p1y" value="0" step="0.001" required>
+            <br>
+            <a>p2: </a>
+            <input type="number" id="p2x" name="p2x" value="0" step="0.001" required>
+            <input type="number" id="p2y" name="p2y" value="0" step="0.001" required>
+            <br>
+            <a>p3: </a>
+            <input type="number" id="p3x" name="p3x" value="0" step="0.001" required>
+            <input type="number" id="p3y" name="p3y" value="0" step="0.001" required>
+            <button type="submit">Submit</button>
+        </form>
+        
+        <% if (size) { %>
+            <p>You chose <%= size %></p>
+        <% } %>
+    </body>
+</html> 
+

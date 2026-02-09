@@ -64,6 +64,20 @@ app.post('/gradientSubmit', (req, res) => {
   res.render('gradients', { numBlocks: numBlocks, fromColour: fromColour, toColour: toColour });
 });
 
+// ####################
+// #    CURVE PAGE    #
+// ####################
+
+// Gradients page get request
+app.get('/curves', (req, res) => {
+  res.render('curves', { size: 10 });
+});
+
+app.post('/curveSubmit', (req, res) => {
+  const size = req.body.size;
+  res.render('curves', { size: size });
+});
+
 // Run server on port 3000
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
