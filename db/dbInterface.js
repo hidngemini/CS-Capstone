@@ -52,20 +52,54 @@ class DB {
         insertGradientString.run(date, numBlocks, fromHex, toHex);
     }
 
-    insertTexture(textureBlob, hexStr, direction, debug=false) {
+    insertTexture(textureBlob, hexStr, debug=false) {
         // print stuff if debugging
         if (debug) {
             console.log(`inserting texture with colour: ${hexStr}`);
+            console.log(`inserting this blob:`);
+            console.log(textureBlob);
         }
 
         // prepare sql query
         const insertTextureString = this.#db.prepare(`INSERT INTO Texture
-            (texture, avgColour, direction) VALUES (?,?,?)`);
+            (texture, avgColour) VALUES (?,?)`);
 
-        var texture = textureBlob;
         var colourHex = this.convertColour(hexStr);
 
-        insertTextureString.run(texture, colourHex, direction);
+        insertTextureString.run(textureBlob, colourHex);
+    }
+
+    async getAllColours() {
+        return new Promise((resolve, reject) => {
+            this.#db.all(
+                "SELECT avgColour FROM Texture",
+                [],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                }
+            );
+        });
+    }
+
+    async getTex(hexStr) {
+        var colourDec = this.convertColour(hexStr);
+        return new Promise((resolve, reject) => {
+            this.#db.all(
+                "SELECT * FROM Texture WHERE avgColour = ?",
+                [colourDec],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                }
+            );
+        });
     }
 
     close() {

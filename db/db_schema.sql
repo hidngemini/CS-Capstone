@@ -54,6 +54,5 @@ CREATE TABLE "Texture" (
 	"textureId" INTEGER NOT NULL, 
 	"texture" BLOB NOT NULL,
 	"avgColour" INTEGER NOT NULL,
-	"direction" INTEGER NOT NULL,
 	PRIMARY KEY (textureId)
 )

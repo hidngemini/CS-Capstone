@@ -18,6 +18,12 @@
         <% if (numBlocks) { %>
             <p>You chose <%= fromColour %> and <%= toColour %> with a length of <%= numBlocks %></p>
         <% } %>
+
+        <% if (textures) { %>
+            <% for (var i = 0; i < textures.length; i++) { %>
+                <img src="<%= textures[i] %>" alt="texture" width="150px" style="image-rendering: crisp-edges;">
+            <% } %>
+        <% } %>
     </body>
 </html> 
 
