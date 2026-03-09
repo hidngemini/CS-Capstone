@@ -2,12 +2,12 @@
     <head>
       <title>Curves</title>
   </head>
-  <canvas id="curveCanvas" width="1920" height="1080"></canvas>
+  <canvas id="curveCanvas" width="800" height="800"></canvas>
 
   <script>
-  const canvas = document.getElementById("curveCanvas");
-  const ctx = canvas.getContext("2d");
   const gridSize = 25;
+  const radius = 8;
+  var draggingPoint = null;
 
   var points = [
     {x:50, y:300},
@@ -16,8 +16,8 @@
     {x:550, y:300}
   ];
 
-  var draggingPoint = null;
-  const radius = 8;
+  const canvas = document.getElementById("curveCanvas");
+  const context = canvas.getContext("2d");
 
   // curve generation function
   function cubicBezier(p0, p1, p2, p3) {
@@ -42,27 +42,27 @@
 
   function drawGrid(){
 
-    ctx.strokeStyle="#ddd";
-    ctx.lineWidth=1;
+    context.strokeStyle="#ddd";
+    context.lineWidth=1;
 
-    for(let x=0;x<=canvas.width;x+=gridSize){
-      ctx.beginPath();
-      ctx.moveTo(x,0);
-      ctx.lineTo(x,canvas.height);
-      ctx.stroke();
+    for(var x = 0; x <= canvas.width; x += gridSize){
+      context.beginPath();
+      context.moveTo(x,0);
+      context.lineTo(x,canvas.height);
+      context.stroke();
     }
 
-    for(let y=0;y<=canvas.height;y+=gridSize){
-      ctx.beginPath();
-      ctx.moveTo(0,y);
-      ctx.lineTo(canvas.width,y);
-      ctx.stroke();
+    for(var y = 0; y <= canvas.height; y += gridSize){
+      context.beginPath();
+      context.moveTo(0,y);
+      context.lineTo(canvas.width,y);
+      context.stroke();
     }
   }
 
   function draw() {
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    context.clearRect(0,0,canvas.width,canvas.height);
 
     drawGrid();
 
@@ -71,32 +71,37 @@
     const crossed = new Set();
 
     // draw curve
-    ctx.beginPath();
+    context.beginPath();
 
-    for(var t=0; t<=1; t+=0.01){
+    // iterate long curve
+    for(var t = 0; t <= 1; t += 0.003){
       const p = curve(t);
 
-      if(t===0) ctx.moveTo(p.x,p.y);
-      else ctx.lineTo(p.x,p.y);
+      if(t === 0) {
+        context.moveTo(p.x,p.y);
+      } else {
+        context.lineTo(p.x,p.y);
+      }
 
       const col = Math.floor(p.x / gridSize);
       const row = Math.floor(p.y / gridSize);
 
-      crossed.add(row + "," + col);
+      crossed.add(row + "," + col); //TODO: surely there's a better way to do this
     }
 
-    ctx.strokeStyle="blue";
-    ctx.lineWidth=2;
-    ctx.stroke();
+    context.strokeStyle="blue";
+    context.lineWidth=2;
+    context.stroke();
 
     
     // fill visited cells
-    ctx.fillStyle="rgba(0,150,255,0.3)";
+    context.fillStyle="rgba(0,150,255,0.3)";
 
-    crossed.forEach(key=>{
+    crossed.forEach(key => {
       const [row,col] = key.split(",").map(Number);
 
-      ctx.fillRect(
+      // fill in grid rectangle
+      context.fillRect(
         col*gridSize,
         row*gridSize,
         gridSize,
@@ -106,32 +111,31 @@
 
 
     // line from p0 to p1
-    ctx.beginPath();
-    ctx.moveTo(p0.x,p0.y);
-    ctx.lineTo(p1.x,p1.y);
-    ctx.setLineDash([5,5]);
-    ctx.strokeStyle="gray";
-    ctx.stroke();
-    ctx.setLineDash([]);
+    context.beginPath();
+    context.moveTo(p0.x,p0.y);
+    context.lineTo(p1.x,p1.y);
+    context.setLineDash([5,5]);
+    context.strokeStyle="gray";
+    context.stroke();
 
     // line from p2 to p3
-    ctx.beginPath();
-    ctx.lineTo(p2.x,p2.y); 
-    ctx.lineTo(p3.x,p3.y);
-    ctx.setLineDash([5,5]);
-    ctx.strokeStyle="gray";
-    ctx.stroke();
-    ctx.setLineDash([]);
+    context.beginPath();
+    context.lineTo(p2.x,p2.y); 
+    context.lineTo(p3.x,p3.y);
+    context.setLineDash([5,5]);
+    context.strokeStyle="gray";
+    context.stroke();
+    context.setLineDash([]); // reset line dashing
 
 
     // draw points
-    points.forEach((p,i)=>{
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+    points.forEach((p,i) => {
+      context.beginPath();
+      context.arc(p.x,p.y,radius,0,Math.PI*2);
 
-      ctx.fillStyle = "grey"
+      context.fillStyle = "grey"
 
-      ctx.fill();
+      context.fill();
     });
   }
 
@@ -146,13 +150,16 @@
   }
 
   // mouse click function
-  canvas.addEventListener("mousedown",(e)=>{
+  canvas.addEventListener("mousedown", (e) => {
     const mouse = getMousePos(e);
 
-    points.forEach(p=>{
+    // iterate through each point
+    points.forEach(p => {
+      // get distance from point
       const dx = mouse.x - p.x;
       const dy = mouse.y - p.y;
 
+      // is the mouse within this point?
       if(Math.sqrt(dx*dx + dy*dy) < radius){
         draggingPoint = p;
       }
