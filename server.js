@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const dbInterface = require('./db/dbInterface.js');
 const colourUtils = require('./colours/colours.js');
+const fs = require('node:fs');
 
 app.set('view engine', 'ejs'); // set ejs as view engine
 
@@ -9,8 +10,8 @@ app.set('view engine', 'ejs'); // set ejs as view engine
 app.use(express.urlencoded({ extended: true }));
 
 // initalize db interface
-var db = new dbInterface.DB('db/db.db', 'db/db_schema.sql')
-colourUtils.populateDB(db);
+var db = new dbInterface.DB('db/db.db', 'db/db_schema.sql');
+colourUtils.miniPopulateDB(db);
 
 // #####################
 // #     HOME PAGE     #
@@ -26,7 +27,7 @@ app.get('/', (req, res) => {
 
 // Palette page get request
 app.get('/palettes', (req, res) => {
-  res.render('palettes', { colour: null, imageData: null });
+  res.render('palettes', { colours: null, textures: null });
 });
 
 // Palette submission post request
@@ -34,18 +35,25 @@ app.post('/paletteSubmit', async (req, res) => {
   //TODO: This is currently just doing colours. Update this for full palettes
 
   // unpack request
-  const colour = req.body.colour;
+  const colours = req.body.colours;
 
   // insert into db
   // db.insertColour(colour);
   
   // get nearest colour
-  const nearest = await colourUtils.getNearestColour(db, colour);
-  const texData = await db.getTex(nearest);
-  const texture = texData[0].texture;
+  var textures = []
+  var comps = []
+  for (var i = 0; i < colours.length; i++) {
+    colour = colours[i];
+    const nearest = await colourUtils.getNearestColour(db, colour, false);
+    const texData = await db.getTex(nearest);
+    const texture = texData[0].texture;
+    textures.push(texture);
+    comps.push(colourUtils.getComplementary(colours[i]));
+  }
 
   // render page with request details
-  res.render('palettes', { colour: colour, imageData: texture });
+  res.render('palettes', { colours: comps, textures: textures });
 });
 
 // #####################
@@ -67,22 +75,16 @@ app.post('/gradientSubmit', async (req, res) => {
   // insert into db
   db.insertGradient(numBlocks, fromColour, toColour);
 
-  // get nearest colours
-  const nearest1 = await colourUtils.getNearestColour(db, fromColour);
-  const texData1 = await db.getTex(nearest1);
-  const texture1 = texData1[0].texture;
-  
-  const nearest2 = await colourUtils.getNearestColour(db, toColour);
-  const texData2 = await db.getTex(nearest2);
-  const texture2 = texData2[0].texture;
-
-  // package colours into array
-  var texArr = [];
-  texArr.push(texture1);
-  texArr.push(texture2);
+  const colours = colourUtils.generateGradient(fromColour, toColour, numBlocks);
+  var textures = [];
+  for (var i = 0; i < colours.length; i++) {
+    var nearest = await colourUtils.getNearestColour(db, colours[i], true);
+    var texData = await db.getTex(nearest);
+    textures.push(texData[0].texture);
+  }
 
   // render page with request details
-  res.render('gradients', { numBlocks: numBlocks, fromColour: fromColour, toColour: toColour, textures: texArr });
+  res.render('gradients', { numBlocks: numBlocks, fromColour: fromColour, toColour: toColour, textures: textures });
 });
 
 // ####################
@@ -94,10 +96,33 @@ app.get('/curves', (req, res) => {
   res.render('curves', { size: 10});
 });
 
-app.post('/curveSubmit', (req, res) => {
-  const size = req.body.size;
-  res.render('curves', { size: size});
+///////////////////////
+
+var file = fs.createWriteStream('debugArray.txt');
+app.get('/categorize', async (req, res) => {
+  const textureDataArr = await db.getAllValues();
+  const tex = textureDataArr[0].texture;
+  res.render('categorization', { i: 0, good: 1, tex: tex })
 });
+
+cats = [];
+
+app.post('/categorySubmit', async (req, res) => {
+  const i = req.body.i;
+  var good = req.body.good;
+  const textureDataArr = await db.getAllValues();
+  cats.push([textureDataArr[Number(i)].textureId, good]);
+
+  if (Number(i) == textureDataArr.length) {
+    file.end();
+  } else {
+    const tex = textureDataArr[Number(i)+1].texture;
+    file.write(textureDataArr[Number(i)].textureId + ", " + good + '\n');
+    res.render('categorization', { i: Number(i)+1, good: good, tex: tex });
+  }
+});
+
+///////////////////////
 
 // Run server on port 3000
 app.listen(3000, () => {

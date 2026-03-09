@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Categorization</title>
+    </head>
+    <body>
+        <!-- <h1>Let's Categorize Some Things!</h1> -->
+        <!-- <h2>Maddy I hate you for lying that was more than "some" things that took AN HOUR</h2> -->
+        <!-- <a href="/">back</a> -->
+
+        <br>
+        <img src="<%= tex %>" alt="texture" width="150px" style="image-rendering: crisp-edges;">
+        <br>
+
+        <form action="/categorySubmit" method="POST">
+            <div>don't touch this!</div>
+            <input type="number" id="i" name="i" value="<%=i%>" required>
+            <div>isFull?</div>
+            <input type="checkbox" id="good" name="good" value=<%=good%>>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html> 
+

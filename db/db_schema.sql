@@ -7,15 +7,6 @@ drop TABLE if EXISTS Gradient;
 drop TABLE if EXISTS Palette;
 drop TABLE if EXISTS Texture;
 
--- purely for testing purposes; #TODO: REMOVE THIS EVENTUALLY
-drop TABLE if EXISTS Colour;
-CREATE TABLE "Colour" (
-	"colourId" INTEGER NOT NULL,
-	"dateCreated"  INTEGER NOT NULL,
-    "hex" INTEGER NOT NULL,
-	PRIMARY KEY(colourId)
-);
-
 -- curve table
 CREATE TABLE "Curve" (
 	"curveId"	INTEGER NOT NULL,
@@ -52,7 +43,9 @@ CREATE TABLE "Palette" (
 -- textures table
 CREATE TABLE "Texture" (
 	"textureId" INTEGER NOT NULL, 
+	"itemName" TEXT NOT NULL,
 	"texture" BLOB NOT NULL,
 	"avgColour" INTEGER NOT NULL,
+	"allowed" INTEGER,
 	PRIMARY KEY (textureId)
 )

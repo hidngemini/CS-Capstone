@@ -1,15 +1,25 @@
 const sqlite3 = require("sqlite3");
 const fs = require("node:fs");
+const readline = require('readline');
 
 class DB {
     #db; // # means private :)
+    #allowArray;
+    #numTexs;
 
     constructor(dbFile, schema = null) {
+        // load database
         this.#db = new sqlite3.Database(dbFile);
+
+        // clear database if schema file provided
         if (schema !== null) {
             const schemaData = fs.readFileSync(schema, 'utf-8');
             this.#db.exec(schemaData);
+            this.#numTexs = 0;
         }
+
+        // read in allow data from text file
+        this.#allowArray = this.readAllowData("array.csv");
     }
 
     convertColour(hexStr) {
@@ -44,7 +54,10 @@ class DB {
         const insertGradientString = this.#db.prepare(`INSERT INTO Gradient
             (dateCreated,numBlocks,fromHex,toHex) VALUES (?,?,?,?)`);
         
+        // get timestamp
         var date = Date.now();
+        
+        // convert hex
         var fromHex = this.convertColour(fromHexStr);
         var toHex = this.convertColour(toHexStr);
 
@@ -52,21 +65,51 @@ class DB {
         insertGradientString.run(date, numBlocks, fromHex, toHex);
     }
 
-    insertTexture(textureBlob, hexStr, debug=false) {
-        // print stuff if debugging
-        if (debug) {
-            console.log(`inserting texture with colour: ${hexStr}`);
-            console.log(`inserting this blob:`);
-            console.log(textureBlob);
+    insertTexture(itemName, textureBlob, hexStr, debug=false) {
+        // prepare variables
+        this.#numTexs++;
+        var colourHex = this.convertColour(hexStr);
+        var allowed = 0;
+        if (this.#allowArray.includes(this.#numTexs)) {
+            allowed = 1;
+        }
+        
+        // prepare sql; this is vulnerable to sql injection, but it is not public facing, so this isn't an issue.
+        const sqlStr = `INSERT INTO Texture (itemName, texture, avgColour, allowed) VALUES ("${itemName}", "${textureBlob}", ${colourHex}, ${allowed})`;
+
+        // execute sql
+        this.#db.exec(sqlStr);
+    }
+
+    readAllowData(filename) {
+        var allowedArr = [];
+
+        const fileStream = fs.createReadStream(filename);
+
+        const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+        });
+
+        rl.on('line', (line) => {
+        // Each line like: "1, 1"
+        const [value1, value2] = line.split(',').map(v => v.trim());
+
+        // Convert to numbers if needed
+        const id = parseInt(value1, 10);
+        const allowed = parseInt(value2, 10);
+
+        if (allowed == 1) {
+            allowedArr.push(id)
         }
 
-        // prepare sql query
-        const insertTextureString = this.#db.prepare(`INSERT INTO Texture
-            (texture, avgColour) VALUES (?,?)`);
+        });
 
-        var colourHex = this.convertColour(hexStr);
+        rl.on('close', () => {
 
-        insertTextureString.run(textureBlob, colourHex);
+        });
+
+        return allowedArr;
     }
 
     async getAllColours() {
@@ -85,12 +128,44 @@ class DB {
         });
     }
 
+    async getAllowedColours() {
+        return new Promise((resolve, reject) => {
+            this.#db.all(
+                "SELECT avgColour FROM Texture WHERE allowed == 1",
+                [],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                }
+            );
+        });
+    }
+
     async getTex(hexStr) {
         var colourDec = this.convertColour(hexStr);
         return new Promise((resolve, reject) => {
             this.#db.all(
                 "SELECT * FROM Texture WHERE avgColour = ?",
                 [colourDec],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                }
+            );
+        });
+    }
+
+    async getAllValues() {
+        return new Promise((resolve, reject) => {
+            this.#db.all(
+                "SELECT * FROM Texture",
+                [],
                 (err, rows) => {
                     if (err) {
                         reject(err);

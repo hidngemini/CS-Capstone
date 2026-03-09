@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Palettes</title>
-    </head>
-    <body>
-        <h1>Palette Generator</h1>
-        <a href="/">back</a>
+<head>
+    <title>Palettes</title>
+</head>
+<body>
+    <h1>Palette Generator</h1>
+    <a href="/">back</a>
 
-        <form action="/paletteSubmit" method="POST">
-            <input type="color" id="colour" name="colour" value=<%=colour ? colour : "#ff0000"%> required>
-            <button type="submit">Submit</button>
-        </form>
+    <form action="/paletteSubmit" method="POST" id="paletteForm">
+        <div id="colourContainer">
+            <input type="color" name="colours[]" value="#000000" required>
+        </div>
 
-        <% if (colour) { %>
-            <p>You chose <%= colour %></p>
-            <img src="<%= imageData %>" alt="texture" width="150px" style="image-rendering: crisp-edges;">
-        <% } %>
-    </body>
-</html> 
+        <button type="button" onclick="addColour()">Add Colour</button>
+        <button type="submit">Submit</button>
+    </form>
 
+    <% if (colours && colours.length) { %>
+        <h3>Suggested:</h3>
+        <ul>
+            <% colours.forEach(col => { %>
+                <li><%= col %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+
+    <% if (textures && textures.length) { %>
+        <% textures.forEach(texture => { %>
+            <img src="<%= texture %>" alt="texture" width="150px" style="image-rendering: crisp-edges;">
+        <% }) %>
+    <% } %>
+
+    <script>
+        function addColour() {
+            const container = document.getElementById("colourContainer");
+            const input = document.createElement("input");
+            input.type = "color";
+            input.name = "colours[]";
+            input.required = true;
+            container.appendChild(document.createElement("br"));
+            container.appendChild(input);
+        }
+    </script>
+</body>
+</html>
