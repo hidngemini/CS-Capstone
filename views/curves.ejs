@@ -2,12 +2,23 @@
     <head>
       <title>Curves</title>
   </head>
-  <canvas id="curveCanvas" width="800" height="800"></canvas>
+  <body>
+    <canvas id="curveCanvas" width="800" height="800"></canvas>
+    <br>
+    <button id="subSize">-</button>
+    <t id="sizeOut">25px</t>
+    <button id="addSize">+</button>
+    <button id="hideCurve">Hide Curve</button>
+    <br>
+    <t>curveActive=</t>
+    <t id="hideCurveOut">true</t>
+  </body>
 
   <script>
-  const gridSize = 25;
+  var gridSize = 25;
   const radius = 8;
   var draggingPoint = null;
+  var curveActive = true;
 
   var points = [
     {x:50, y:300},
@@ -16,8 +27,16 @@
     {x:550, y:300}
   ];
 
+  // grid
   const canvas = document.getElementById("curveCanvas");
   const context = canvas.getContext("2d");
+
+  // buttons
+  const hideCurve = document.getElementById("hideCurve");
+  const hideCurveOut = document.getElementById("hideCurveOut");
+  const subButton = document.getElementById("subSize");
+  const plusButton = document.getElementById("addSize");
+  const sizeOut = document.getElementById("sizeOut");
 
   // curve generation function
   function cubicBezier(p0, p1, p2, p3) {
@@ -77,10 +96,12 @@
     for(var t = 0; t <= 1; t += 0.003){
       const p = curve(t);
 
-      if(t === 0) {
-        context.moveTo(p.x,p.y);
-      } else {
-        context.lineTo(p.x,p.y);
+      if (curveActive) {
+        if (t === 0) {
+          context.moveTo(p.x,p.y);
+        } else {
+          context.lineTo(p.x,p.y);
+        }
       }
 
       const col = Math.floor(p.x / gridSize);
@@ -139,6 +160,10 @@
     });
   }
 
+  function drawCurve() {
+    
+  }
+
   // mouse position function
   function getMousePos(evt){
     const rect = canvas.getBoundingClientRect();
@@ -182,6 +207,25 @@
   // detect mouse unclick
   canvas.addEventListener("mouseup",()=>{
     draggingPoint = null;
+  });
+
+  // button functionality
+  hideCurve.addEventListener('mousedown', function(data) {
+    curveActive = !curveActive;
+    hideCurveOut.innerHTML = curveActive;
+    draw();
+  });
+
+  plusButton.addEventListener('mousedown', function(data) {
+    gridSize += 1;
+    sizeOut.innerHTML = gridSize+"px";
+    draw();
+  });
+
+  subButton.addEventListener('mousedown', function(data) {
+    gridSize -= 1;
+    sizeOut.innerHTML = gridSize+"px";
+    draw();
   });
 
   draw();
