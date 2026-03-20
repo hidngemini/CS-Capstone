@@ -98,29 +98,26 @@ app.get('/curves', (req, res) => {
 
 ///////////////////////
 
-var file = fs.createWriteStream('debugArray.txt');
-app.get('/categorize', async (req, res) => {
-  const textureDataArr = await db.getAllValues();
-  const tex = textureDataArr[0].texture;
-  res.render('categorization', { i: 0, good: 1, tex: tex })
-});
+// var file = fs.createWriteStream('debugArray.txt');
+// app.get('/categorize', async (req, res) => {
+//   const textureDataArr = await db.getAllValues();
+//   const tex = textureDataArr[0].texture;
+//   res.render('categorization', { i: 0, good: 1, tex: tex })
+// });
 
-cats = [];
+// app.post('/categorySubmit', async (req, res) => {
+//   const i = req.body.i;
+//   var good = req.body.good;
+//   const textureDataArr = await db.getAllValues();
 
-app.post('/categorySubmit', async (req, res) => {
-  const i = req.body.i;
-  var good = req.body.good;
-  const textureDataArr = await db.getAllValues();
-  cats.push([textureDataArr[Number(i)].textureId, good]);
-
-  if (Number(i) == textureDataArr.length) {
-    file.end();
-  } else {
-    const tex = textureDataArr[Number(i)+1].texture;
-    file.write(textureDataArr[Number(i)].textureId + ", " + good + '\n');
-    res.render('categorization', { i: Number(i)+1, good: good, tex: tex });
-  }
-});
+//   if (Number(i) == textureDataArr.length) {
+//     file.end();
+//   } else {
+//     const tex = textureDataArr[Number(i)+1].texture;
+//     file.write(textureDataArr[Number(i)].itemName + ", " + good + '\n');
+//     res.render('categorization', { i: Number(i)+1, good: good, tex: tex });
+//   }
+// });
 
 ///////////////////////
 

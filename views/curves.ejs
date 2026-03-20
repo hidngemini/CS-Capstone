@@ -9,9 +9,6 @@
     <t id="sizeOut">25px</t>
     <button id="addSize">+</button>
     <button id="hideCurve">Hide Curve</button>
-    <br>
-    <t>curveActive=</t>
-    <t id="hideCurveOut">true</t>
   </body>
 
   <script>
@@ -33,7 +30,6 @@
 
   // buttons
   const hideCurve = document.getElementById("hideCurve");
-  const hideCurveOut = document.getElementById("hideCurveOut");
   const subButton = document.getElementById("subSize");
   const plusButton = document.getElementById("addSize");
   const sizeOut = document.getElementById("sizeOut");
@@ -96,6 +92,7 @@
     for(var t = 0; t <= 1; t += 0.003){
       const p = curve(t);
 
+      // only draw curve if curve is active
       if (curveActive) {
         if (t === 0) {
           context.moveTo(p.x,p.y);
@@ -192,7 +189,7 @@
   });
 
   // dragging the point
-  canvas.addEventListener("mousemove",(e)=>{
+  canvas.addEventListener("mousemove",(e) => {
     if(!draggingPoint) return;
 
     const mouse = getMousePos(e);
@@ -205,29 +202,36 @@
 
 
   // detect mouse unclick
-  canvas.addEventListener("mouseup",()=>{
+  canvas.addEventListener("mouseup",() => {
     draggingPoint = null;
   });
 
-  // button functionality
+  // hide curve button
   hideCurve.addEventListener('mousedown', function(data) {
     curveActive = !curveActive;
-    hideCurveOut.innerHTML = curveActive;
+    if (curveActive) {
+      hideCurve.innerHTML = "Hide Curve";
+    } else {
+      hideCurve.innerHTML = "Show Curve";
+    }
     draw();
   });
 
+  // increase grid size button
   plusButton.addEventListener('mousedown', function(data) {
     gridSize += 1;
     sizeOut.innerHTML = gridSize+"px";
     draw();
   });
 
+  // decrease grid size button
   subButton.addEventListener('mousedown', function(data) {
     gridSize -= 1;
     sizeOut.innerHTML = gridSize+"px";
     draw();
   });
 
+  // draw unconditionally
   draw();
   </script>
 </html>

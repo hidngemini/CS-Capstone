@@ -5,7 +5,6 @@ const readline = require('readline');
 class DB {
     #db; // # means private :)
     #allowArray;
-    #numTexs;
 
     constructor(dbFile, schema = null) {
         // load database
@@ -15,7 +14,6 @@ class DB {
         if (schema !== null) {
             const schemaData = fs.readFileSync(schema, 'utf-8');
             this.#db.exec(schemaData);
-            this.#numTexs = 0;
         }
 
         // read in allow data from text file
@@ -67,10 +65,9 @@ class DB {
 
     insertTexture(itemName, textureBlob, hexStr, debug=false) {
         // prepare variables
-        this.#numTexs++;
         var colourHex = this.convertColour(hexStr);
         var allowed = 0;
-        if (this.#allowArray.includes(this.#numTexs)) {
+        if (this.#allowArray.includes(itemName)) {
             allowed = 1;
         }
         
@@ -96,11 +93,11 @@ class DB {
         const [value1, value2] = line.split(',').map(v => v.trim());
 
         // Convert to numbers if needed
-        const id = parseInt(value1, 10);
+        const itemName = value1
         const allowed = parseInt(value2, 10);
 
         if (allowed == 1) {
-            allowedArr.push(id)
+            allowedArr.push(itemName);
         }
 
         });
