@@ -3,19 +3,37 @@
       <title>Curves</title>
   </head>
   <body>
+    <%- include('partials/menu.ejs') %>
     <canvas id="curveCanvas" width="800" height="800"></canvas>
     <br>
     <button id="subSize">-</button>
-    <t id="sizeOut">25px</t>
+    <t id="sizeOut">15 Blocks</t>
     <button id="addSize">+</button>
     <button id="hideCurve">Hide Curve</button>
+    <button id="sym">Make Symmetrical</button>
   </body>
 
   <script>
-  var gridSize = 25;
+  // grid
+  const canvas = document.getElementById("curveCanvas");
+  const context = canvas.getContext("2d");
+
+  // buttons
+  const hideCurve = document.getElementById("hideCurve");
+  const symButton = document.getElementById("sym");
+  const subButton = document.getElementById("subSize");
+  const plusButton = document.getElementById("addSize");
+  const sizeOut = document.getElementById("sizeOut");
+
+  // constants and variables
+  var gridSize = 15;
+  var stepSize = canvas.width / gridSize;
+
   const radius = 8;
   var draggingPoint = null;
+  var draggingPointSym = null;
   var curveActive = true;
+  var isSymmetrical = false;
 
   var points = [
     {x:50, y:300},
@@ -23,16 +41,6 @@
     {x:450, y:50},
     {x:550, y:300}
   ];
-
-  // grid
-  const canvas = document.getElementById("curveCanvas");
-  const context = canvas.getContext("2d");
-
-  // buttons
-  const hideCurve = document.getElementById("hideCurve");
-  const subButton = document.getElementById("subSize");
-  const plusButton = document.getElementById("addSize");
-  const sizeOut = document.getElementById("sizeOut");
 
   // curve generation function
   function cubicBezier(p0, p1, p2, p3) {
@@ -60,14 +68,14 @@
     context.strokeStyle="#ddd";
     context.lineWidth=1;
 
-    for(var x = 0; x <= canvas.width; x += gridSize){
+    for(var x = 0; x <= canvas.width; x += stepSize){
       context.beginPath();
       context.moveTo(x,0);
       context.lineTo(x,canvas.height);
       context.stroke();
     }
 
-    for(var y = 0; y <= canvas.height; y += gridSize){
+    for(var y = 0; y <= canvas.height; y += stepSize){
       context.beginPath();
       context.moveTo(0,y);
       context.lineTo(canvas.width,y);
@@ -76,6 +84,10 @@
   }
 
   function draw() {
+
+    if (isSymmetrical) {
+      flipPoints();
+    }
 
     context.clearRect(0,0,canvas.width,canvas.height);
 
@@ -89,7 +101,7 @@
     context.beginPath();
 
     // iterate long curve
-    for(var t = 0; t <= 1; t += 0.003){
+    for(var t = 0; t <= 1; t += 0.0001){
       const p = curve(t);
 
       // only draw curve if curve is active
@@ -101,8 +113,8 @@
         }
       }
 
-      const col = Math.floor(p.x / gridSize);
-      const row = Math.floor(p.y / gridSize);
+      const col = Math.floor(p.x / stepSize);
+      const row = Math.floor(p.y / stepSize);
 
       crossed.add(row + "," + col); //TODO: surely there's a better way to do this
     }
@@ -120,10 +132,10 @@
 
       // fill in grid rectangle
       context.fillRect(
-        col*gridSize,
-        row*gridSize,
-        gridSize,
-        gridSize
+        col*stepSize,
+        row*stepSize,
+        stepSize,
+        stepSize
       );
     });
 
@@ -137,28 +149,50 @@
     context.stroke();
 
     // line from p2 to p3
-    context.beginPath();
-    context.lineTo(p2.x,p2.y); 
-    context.lineTo(p3.x,p3.y);
-    context.setLineDash([5,5]);
-    context.strokeStyle="gray";
-    context.stroke();
+    if (!isSymmetrical) {
+      context.beginPath();
+      context.lineTo(p2.x,p2.y); 
+      context.lineTo(p3.x,p3.y);
+      context.setLineDash([5,5]);
+      context.strokeStyle="gray";
+      context.stroke();
+    }
     context.setLineDash([]); // reset line dashing
 
+    // draw line of symmetry
+    if (isSymmetrical) {
+      context.beginPath();
+      context.lineTo(canvas.width/2,0);
+      context.lineTo(canvas.width/2,canvas.height);
+      context.stroke();
+    }
 
     // draw points
     points.forEach((p,i) => {
-      context.beginPath();
-      context.arc(p.x,p.y,radius,0,Math.PI*2);
 
-      context.fillStyle = "grey"
+
+      if (!isSymmetrical || i < 2) {
+        context.beginPath();
+        context.arc(p.x,p.y,radius,0,Math.PI*2);
+        if (i % 3 == 0) { // points 0 and 3 are black (curve end points)
+          context.fillStyle = "black";
+        } else { // points 1 and 2 are grey (curve control points)
+          context.fillStyle = "grey";
+        }
+      }
 
       context.fill();
     });
   }
 
-  function drawCurve() {
-    
+  function flipPoints() {
+    // control points
+    var p0 = points[0];
+    var p1 = points[1];
+    points[2].x = canvas.width - p1.x
+    points[2].y = p1.y
+    points[3].x = canvas.width - p0.x
+    points[3].y = p0.y
   }
 
   // mouse position function
@@ -176,7 +210,7 @@
     const mouse = getMousePos(e);
 
     // iterate through each point
-    points.forEach(p => {
+    points.forEach((p,i) => {
       // get distance from point
       const dx = mouse.x - p.x;
       const dy = mouse.y - p.y;
@@ -204,6 +238,7 @@
   // detect mouse unclick
   canvas.addEventListener("mouseup",() => {
     draggingPoint = null;
+    draggingPointSym = null;
   });
 
   // hide curve button
@@ -217,17 +252,30 @@
     draw();
   });
 
+  // symmetrical button
+  symButton.addEventListener('mousedown', function(data) {
+    isSymmetrical = !isSymmetrical;
+    if (isSymmetrical) {
+      symButton.innerHTML = "Make Asymmetrical";
+    } else {
+      symButton.innerHTML = "Make Symmetrical";
+    }
+    draw();
+  });
+
   // increase grid size button
   plusButton.addEventListener('mousedown', function(data) {
     gridSize += 1;
-    sizeOut.innerHTML = gridSize+"px";
+    stepSize = canvas.width / gridSize;
+    sizeOut.innerHTML = gridSize+" Blocks";
     draw();
   });
 
   // decrease grid size button
   subButton.addEventListener('mousedown', function(data) {
     gridSize -= 1;
-    sizeOut.innerHTML = gridSize+"px";
+    stepSize = canvas.width / gridSize;
+    sizeOut.innerHTML = gridSize+" Blocks";
     draw();
   });
 
