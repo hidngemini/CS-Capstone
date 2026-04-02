@@ -202,34 +202,36 @@
     }
 
     // draw distance lines
-    var dists = computeDistance();
-    console.log(points[0].y, points[3].y);
+    var extrema = findExtrema(crossed);
 
-    context.beginPath();
     context.setLineDash([5,5]);
     context.strokeStyle="gray";
     context.font = fontSize+"px sans-serif";
 
-    // y position is whichever point is lower + some offset
-    if (points[0].y > points[3].y) {
-      var yPos = points[0].y + 0.5*stepSize;
-    } else {
-      var yPos = points[3].y + 0.5*stepSize; 
-    }
-
-    // figure out which point is left and which is right
-    if (points[0].x > points[3].x) {
-      var leftPoint = points[3];
-      var rightPoint = points[0];
-    } else {
-      var leftPoint = points[0];
-      var rightPoint = points[3];
-    }
+    // horizontal y position is lowest point plus some offset
+    var yPos = (extrema.maxY + 1.5)*stepSize;
 
     // horizontal distance line
-    context.lineTo(points[0].x, yPos);
-    context.lineTo(points[3].x, yPos);
-    context.fillText(dists.x + " Blocks", leftPoint.x, yPos+stepSize/2);
+    context.beginPath();
+    context.lineTo(extrema.minX*stepSize, yPos);
+    context.lineTo((extrema.maxX+1)*stepSize, yPos);
+    context.fillText((extrema.maxX-extrema.minX+1) + " Blocks", extrema.minX*stepSize, yPos+stepSize/2);
+    context.stroke();
+
+    // vertical x position is right-most point plus some offset
+    var xPos = (extrema.maxX + 1.5)*stepSize
+
+    // vertical distance line
+    context.beginPath();
+    context.lineTo(xPos, extrema.minY*stepSize);
+    context.lineTo(xPos, (extrema.maxY+1)*stepSize);
+
+    context.save();
+    context.translate(xPos+stepSize/2, (extrema.maxY+1)*stepSize);
+    context.rotate(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+    context.fillText((extrema.maxY-extrema.minY+1) + " Blocks", 0, 0);
+    context.restore();
+
     context.stroke();
 
     context.setLineDash([]); // reset line dashing
@@ -251,10 +253,27 @@
     });
   }
 
-  function computeDistance() {
-    var x = Math.abs(Math.floor(points[0].x/stepSize)-Math.floor(points[3].x/stepSize))+1;
-    var y = Math.abs(Math.floor(points[0].y/stepSize)-Math.floor(points[3].y/stepSize))+1;
-    return {x, y};
+  function findExtrema(set) {
+    var minX = Infinity;
+    var minY = Infinity;
+    var maxX = -1;
+    var maxY = -1;
+    set.forEach(key => {
+      const [row,col] = key.split(",").map(Number);
+      if (row > maxY) {
+        maxY = row;
+      }
+      if (row < minY) {
+        minY = row;
+      }
+      if (col > maxX) {
+        maxX = col;
+      }
+      if (col < minX) {
+        minX = col;
+      }
+    });
+    return {minX, minY, maxX, maxY}
   }
 
   function flipPoints() {
