@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="/css/styles.css">
     <title>Palettes</title>
 </head>
 <body>
     <%- include('partials/menu.ejs') %>
-    <h1>Palette Generator</h1>
-    <a href="/">back</a>
+    <main>
+        <h1>Palette Generator</h1>
+            <form action="/paletteSubmit" method="POST" id="paletteForm">
+                <div id="colourContainer">
+                    <input type="color" name="colours[]" value="#000000" required>
+                </div>
 
-    <form action="/paletteSubmit" method="POST" id="paletteForm">
-        <div id="colourContainer">
-            <input type="color" name="colours[]" value="#000000" required>
-        </div>
+                <button type="button" onclick="addColour()">Add Colour</button>
+                <button type="submit">Submit</button>
+            </form>
 
-        <button type="button" onclick="addColour()">Add Colour</button>
-        <button type="submit">Submit</button>
-    </form>
+            <% if (colours && colours.length) { %>
+                <h3>Suggested:</h3>
+                <ul>
+                    <% colours.forEach(col => { %>
+                        <li><%= col %></li>
+                    <% }) %>
+                </ul>
+            <% } %>
 
-    <% if (colours && colours.length) { %>
-        <h3>Suggested:</h3>
-        <ul>
-            <% colours.forEach(col => { %>
-                <li><%= col %></li>
-            <% }) %>
-        </ul>
-    <% } %>
-
-    <% if (textures && textures.length) { %>
-        <% textures.forEach(texture => { %>
-            <img src="<%= texture %>" alt="texture" width="150px" style="image-rendering: crisp-edges;">
-        <% }) %>
-    <% } %>
-
+            <% if (textures && textures.length) { %>
+                <% textures.forEach(texture => { %>
+                    <img src="<%= texture %>" alt="texture" width="150px" style="image-rendering: crisp-edges; image-rendering: pixelated;">
+                <% }) %>
+            <% } %>
+    </main>
     <script>
         function addColour() {
             const container = document.getElementById("colourContainer");

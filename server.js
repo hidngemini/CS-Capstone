@@ -8,6 +8,7 @@ app.set('view engine', 'ejs'); // set ejs as view engine
 
 // initialize form data thingy
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // initalize db interface
 var db = new dbInterface.DB('db/db.db', 'db/db_schema.sql');

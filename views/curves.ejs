@@ -1,16 +1,20 @@
 <html>
-    <head>
-      <title>Curves</title>
+  <head>
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Curves</title>
   </head>
   <body>
     <%- include('partials/menu.ejs') %>
-    <canvas id="curveCanvas" width="800" height="800"></canvas>
-    <br>
-    <button id="subSize">-</button>
-    <t id="sizeOut">15 Blocks</t>
-    <button id="addSize">+</button>
-    <button id="hideCurve">Hide Curve</button>
-    <button id="sym">Make Symmetrical</button>
+    <main>
+      <canvas id="curveCanvas" width="700" height="700"></canvas>
+      <div class="curveControls" style="max-width: 710px;">
+        <button id="subSize">-</button>
+        <t id="sizeOut">15 Blocks</t>
+        <button id="addSize">+</button>
+        <button id="hideCurve">Hide Curve</button>
+        <button id="sym">Make Symmetrical</button>
+      </div>
+    </main>
   </body>
 
   <script>
@@ -29,18 +33,45 @@
   var gridSize = 15;
   var stepSize = canvas.width / gridSize;
 
-  const radius = 8;
+  const radius = 10;
   var draggingPoint = null;
-  var draggingPointSym = null;
   var curveActive = true;
   var isSymmetrical = false;
 
   var points = [
-    {x:50, y:300},
-    {x:150, y:50},
+    {x:50, y:500},
+    {x:150, y:100},
     {x:450, y:50},
     {x:550, y:300}
   ];
+  var oldWidth = window.innerHeight-140; // used to rescale points when resizing window
+
+  // initialize window size
+  resize()
+
+  // rescale points and canvas
+  function resize() {
+    // resize canvas
+    if (window.innerHeight <= window.innerWidth) {
+      canvas.width = window.innerHeight-140;
+      canvas.height = window.innerHeight-140;
+    } else {
+      canvas.width = window.innerWidth-140;
+      canvas.height = window.innerWidth-140;
+    }
+
+    // recompute stepsize based on canvas width
+    stepSize = canvas.width / gridSize;
+
+    // rescale points based on previous window size and new window size
+    points.forEach(p => {
+      p.x = p.x / oldWidth * canvas.width;
+      p.y = p.y / oldWidth * canvas.width;
+    });
+
+    // update oldwidth
+    oldWidth = canvas.width;
+  }
 
   // curve generation function
   function cubicBezier(p0, p1, p2, p3) {
@@ -55,19 +86,20 @@
           Math.pow(t,3) * p3.x,
 
         y:
-          Math.pow(u,3)*p0.y +
-          3*Math.pow(u,2)*t*p1.y +
-          3*u*Math.pow(t,2)*p2.y +
-          Math.pow(t,3)*p3.y
+          Math.pow(u,3) * p0.y +
+          3 * Math.pow(u,2) * t * p1.y +
+          3 * u * Math.pow(t,2) * p2.y +
+          Math.pow(t,3) * p3.y
       };
     };
   }
 
   function drawGrid(){
-
+    // grey 
     context.strokeStyle="#ddd";
     context.lineWidth=1;
 
+    // vertical grid lines
     for(var x = 0; x <= canvas.width; x += stepSize){
       context.beginPath();
       context.moveTo(x,0);
@@ -75,6 +107,7 @@
       context.stroke();
     }
 
+    // horizontal grid lines
     for(var y = 0; y <= canvas.height; y += stepSize){
       context.beginPath();
       context.moveTo(0,y);
@@ -238,7 +271,6 @@
   // detect mouse unclick
   canvas.addEventListener("mouseup",() => {
     draggingPoint = null;
-    draggingPointSym = null;
   });
 
   // hide curve button
@@ -276,6 +308,12 @@
     gridSize -= 1;
     stepSize = canvas.width / gridSize;
     sizeOut.innerHTML = gridSize+" Blocks";
+    draw();
+  });
+
+  // on resize
+  window.addEventListener('resize', () => {
+    resize();
     draw();
   });
 
