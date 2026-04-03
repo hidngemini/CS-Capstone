@@ -62,12 +62,21 @@ app.post('/paletteSubmit', async (req, res) => {
 // #####################
 
 // Gradients page get request
-app.get('/gradients', (req, res) => {
-  res.render('gradients', { numBlocks: null, fromColour: "#000000", toColour: "#ffffff", textures: null});
+app.get('/gradients', async (req, res) => {
+  const colours = colourUtils.generateGradient("#000000", "#ffffff", 8);
+  var textures = [];
+
+  for (var i = 0; i < colours.length; i++) {
+    var nearest = await colourUtils.getNearestColour(db, colours[i], true);
+    var texData = await db.getTex(nearest);
+    textures.push(texData[0].texture);
+  }
+
+  res.render('gradients', { numBlocks: 8, fromColour: "#000000", toColour: "#ffffff", textures: textures });
 });
 
 // Gradients page post request
-app.post('/gradientSubmit', async (req, res) => {
+app.post('/gradients', async (req, res) => {
   // unpack request
   const numBlocks = req.body.numBlocks;
   const fromColour = req.body.fromColour;

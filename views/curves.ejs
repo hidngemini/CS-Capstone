@@ -226,9 +226,10 @@
     context.lineTo(xPos, extrema.minY*stepSize);
     context.lineTo(xPos, (extrema.maxY+1)*stepSize);
 
+    // vertical text (nightmare)
     context.save();
     context.translate(xPos+stepSize/2, (extrema.maxY+1)*stepSize);
-    context.rotate(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+    context.rotate(-Math.PI / 2); 
     context.fillText((extrema.maxY-extrema.minY+1) + " Blocks", 0, 0);
     context.restore();
 

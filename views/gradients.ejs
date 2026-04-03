@@ -9,26 +9,63 @@
         <main>
             <div class="centerPage">
                 <h1>Gradient Generator</h1>
-                <form action="/gradientSubmit" method="POST">
-                    <div id="rectangle" style="width:30%; height:30px; background-image:linear-gradient(to right, <%=fromColour%>, <%=toColour%>)"></div>
-                    <input type="number" id="numBlocks" name="numBlocks" value=<%=numBlocks ? numBlocks : "3"%> min="3" max="30" />
-                    <input type="color" id="fromColour" name="fromColour" value=<%=fromColour ? fromColour : "#ff0000"%> required>
-                    <input type="color" id="toColour" name="toColour" value=<%=toColour ? toColour : "#ffffff"%> required>
-                    <button type="submit">Submit</button>
+                <form action="/gradients" method="POST">
+
+                    <div class="gradientDisplay" style="display: flex;">
+                        <div id="gradientStart" class="gradientStart" style="background-color: <%=fromColour%>"></div>
+                        <div id="gradient" style="background-image:linear-gradient(to right, <%=fromColour%>, <%=toColour%>); height: 40px; width: 90%"></div>
+                        <div id="gradientEnd" class="gradientEnd" style="background-color: <%=toColour%>"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <input class="gradientColour" type="color" id="fromColour" name="fromColour" value=<%=fromColour ? fromColour : "#ff0000"%> required>
+                        <input type="number" id="numBlocks" name="numBlocks" value=<%=numBlocks ? numBlocks : "3"%> min="3" max="30" />
+                        <input class="gradientColour" type="color" id="toColour" name="toColour" value=<%=toColour ? toColour : "#ffffff"%> required>
+                    </div>
+                    <div style="display: flex; justify-content: space-evenly;">
+                        <button type="submit"><span>Generate Gradient!</span></button>
+                    </div>
                 </form>
-
-                <% if (numBlocks) { %>
-                    <p>You chose <%= fromColour %> and <%= toColour %> with a length of <%= numBlocks %></p>
-                <% } %>
-
-                <% if (textures) { %>
-                    <% for (var i = 0; i < textures.length; i++) { %>
-                        <img src="<%= textures[i] %>" alt="texture" width="150px" style="image-rendering: crisp-edges; image-rendering: pixelated;">
-                    <% } %>
-                <% } %>
-
             </div>
+            <% if (textures) { %>
+                <div id="blockDisplay" class="blockDisplay">
+                    <% if (textures) { %>
+                        <% for (var i = 0; i < textures.length; i++) { %>
+                            <img src="<%= textures[i] %>" class="block" alt="texture" width="200px">
+                        <% } %>
+                    <% } %>
+                </div>
+            <% } %>
         </main>
     </body>
+    <script>
+        const fromColourButton = document.getElementById("fromColour");
+        const toColourButton = document.getElementById("toColour");
+        const gradientStart = document.getElementById("gradientStart");
+        const gradient = document.getElementById("gradient");
+        const gradientEnd = document.getElementById("gradientEnd");
+        const blockDisplay = document.getElementById("blockDisplay");
+        const numBlocks = document.getElementById("numBlocks").value;
+
+        var fromColour = fromColourButton.value;
+        var toColour = fromColourButton.value;
+
+        if (numBlocks <= 8) {
+            blockDisplay.style = "width:" + 200*numBlocks + "px";
+        }
+
+        fromColourButton.addEventListener("change",(e) => {
+            fromColour = fromColourButton.value;
+            toColour = toColourButton.value;
+            gradient.style="background-image:linear-gradient(to right,"+ fromColour + ", " + toColour +"); height: 40px; width: 90%"
+            gradientStart.style="background-color: " + fromColour;
+        });
+
+        toColourButton.addEventListener("change",(e) => {
+            fromColour = fromColourButton.value;
+            toColour = toColourButton.value;
+            gradient.style="background-image:linear-gradient(to right,"+ fromColour + ", " + toColour +"); height: 40px; width: 90%"
+            gradientEnd.style="background-color: " + toColour;
+        });
+    </script>
 </html> 
 
