@@ -10,19 +10,23 @@
         <h1>Palette Generator</h1>
             <form action="/paletteSubmit" method="POST" id="paletteForm">
                 <div id="colourContainer">
-                    <input type="color" name="colours[]" value="#000000" required>
+                    <% colours.forEach(col => { %>
+                        <input type="color" name="colours[]" value=<%=col%> required>
+                    <% }) %> 
                 </div>
 
                 <button type="button" onclick="addColour()">Add Colour</button>
                 <button type="submit">Submit</button>
             </form>
 
-            <% if (colours && colours.length) { %>
+            <% if (comps && comps.length) { %>
                 <h3>Suggested:</h3>
                 <ul>
-                    <% colours.forEach(col => { %>
-                        <li><%= col %></li>
-                    <% }) %>
+                    <% for (var i = 0; i < comps.length; i++) { %>
+                        <li><%= comps[i] %></li>
+                        <button type="button" onclick="addComp(<%=i%>)">Add This Colour</button>
+                        <input type="color" name="comps[]" id="comps<%=i%>" value=<%=comps[i]%>>
+                    <% } %>
                 </ul>
             <% } %>
 
@@ -33,14 +37,24 @@
             <% } %>
     </main>
     <script>
-        function addColour() {
+        function addColour(setColour=null) {
             const container = document.getElementById("colourContainer");
             const input = document.createElement("input");
             input.type = "color";
             input.name = "colours[]";
+            if (setColour) {
+                input.value = setColour;
+            }
             input.required = true;
-            container.appendChild(document.createElement("br"));
             container.appendChild(input);
+        }
+
+        function addComp(num) { 
+            compsName = "comps" + num;
+            const container = document.getElementById(compsName);
+            const colour = container.value;
+            console.log(colour);
+            addColour(colour);
         }
     </script>
 </body>

@@ -28,13 +28,11 @@ app.get('/', (req, res) => {
 
 // Palette page get request
 app.get('/palettes', (req, res) => {
-  res.render('palettes', { colours: null, textures: null });
+  res.render('palettes', { colours: ["#dedede", "#d3901d", "#303030"], comps: null, textures: null });
 });
 
 // Palette submission post request
 app.post('/paletteSubmit', async (req, res) => {
-  //TODO: This is currently just doing colours. Update this for full palettes
-
   // unpack request
   const colours = req.body.colours;
 
@@ -50,11 +48,14 @@ app.post('/paletteSubmit', async (req, res) => {
     const texData = await db.getTex(nearest);
     const texture = texData[0].texture;
     textures.push(texture);
-    comps.push(colourUtils.getComplementary(colours[i]));
+    var comp = colourUtils.getComplementary(colours[i]);
+    if (!colours.includes(comp)) {
+      comps.push(comp);
+    }
   }
 
   // render page with request details
-  res.render('palettes', { colours: comps, textures: textures });
+  res.render('palettes', { colours: colours, comps: comps, textures: textures });
 });
 
 // #####################
