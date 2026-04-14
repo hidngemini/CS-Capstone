@@ -7,34 +7,36 @@
 <body>
     <%- include('partials/menu.ejs') %>
     <main>
-        <h1>Palette Generator</h1>
-            <form action="/paletteSubmit" method="POST" id="paletteForm">
-                <div id="colourContainer">
-                    <% colours.forEach(col => { %>
-                        <input type="color" name="colours[]" value=<%=col%> required>
-                    <% }) %> 
-                </div>
+        <div class="centerPage">
+            <h1>Palette Generator</h1>
+                <form action="/paletteSubmit" method="POST" id="paletteForm">
+                    <div id="colourContainer">
+                        <% colours.forEach(col => { %>
+                            <input type="color" name="colours[]" value=<%=col%> required>
+                        <% }) %> 
+                    </div>
 
-                <button type="button" onclick="addColour()">Add Colour</button>
-                <button type="submit">Submit</button>
-            </form>
+                    <button type="button" onclick="addColour()">Add Colour</button>
+                    <button type="submit">Submit</button>
+                </form>
 
-            <% if (comps && comps.length) { %>
-                <h3>Suggested:</h3>
-                <ul>
-                    <% for (var i = 0; i < comps.length; i++) { %>
-                        <li><%= comps[i] %></li>
-                        <button type="button" onclick="addComp(<%=i%>)">Add This Colour</button>
-                        <input type="color" name="comps[]" id="comps<%=i%>" value=<%=comps[i]%>>
-                    <% } %>
-                </ul>
-            <% } %>
+                <% if (comps && comps.length) { %>
+                    <h3>Suggested:</h3>
+                    <ul>
+                        <% for (var i = 0; i < comps.length; i++) { %>
+                            <li><%= comps[i] %></li>
+                            <button type="button" onclick="addComp(<%=i%>)">Add This Colour</button>
+                            <input type="color" name="comps[]" id="comps<%=i%>" value=<%=comps[i]%>>
+                        <% } %>
+                    </ul>
+                <% } %>
 
-            <% if (textures && textures.length) { %>
-                <% textures.forEach(texture => { %>
-                    <img src="<%= texture %>" alt="texture" width="150px" style="image-rendering: crisp-edges; image-rendering: pixelated;">
-                <% }) %>
-            <% } %>
+                <% if (textures && textures.length) { %>
+                    <% textures.forEach(texture => { %>
+                        <img src="<%= texture %>" alt="texture" width="150px" style="image-rendering: crisp-edges; image-rendering: pixelated;">
+                    <% }) %>
+                <% } %>
+        </div>
     </main>
     <script>
         function addColour(setColour=null) {
