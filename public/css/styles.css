@@ -6,6 +6,7 @@
   --grad: linear-gradient(135deg, #6a11cb, #2575fc);
 
   --background: slategrey;
+  /* --background: white; */
   --outline: #000000;
 
   --corner-rad: 100px;

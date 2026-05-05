@@ -12,7 +12,7 @@ app.use(express.static('public'));
 
 // initalize db interface
 var db = new dbInterface.DB('db/db.db', 'db/db_schema.sql');
-colourUtils.miniPopulateDB(db);
+colourUtils.populateDB(db);
 
 // #####################
 // #     HOME PAGE     #
@@ -32,7 +32,7 @@ app.get('/palettes', (req, res) => {
 });
 
 // Palette submission post request
-app.post('/paletteSubmit', async (req, res) => {
+app.post('/palettes', async (req, res) => {
   // unpack request
   const colours = req.body.colours;
 

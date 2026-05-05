@@ -4,17 +4,6 @@ const fs = require('node:fs');
 const mcAssets = require("minecraft-assets")("1.21.8");
 
 async function populateDB(db) {
-    // iterate through each block
-    mcAssets.blocksArray.forEach(async element => {
-        blob = mcAssets.textureContent[element.name].texture;
-        // if it has a texture, insert the block
-        if (blob != null) {
-            await prepareAndInsert(db, itemName, blob);
-        }
-    });
-}
-
-async function miniPopulateDB(db) {
     var full = mcAssets.blocksArray.length-1
     for (var i = 0; i <= full; i++) {
         var element = mcAssets.blocksArray[i];

@@ -9,7 +9,7 @@
     <main>
         <div class="centerPage">
             <h1>Palette Generator</h1>
-                <form action="/paletteSubmit" method="POST" id="paletteForm">
+                <form action="/palettes" method="POST" id="paletteForm">
                     <div id="colourContainer">
                         <% colours.forEach(col => { %>
                             <input type="color" name="colours[]" value=<%=col%> required>
