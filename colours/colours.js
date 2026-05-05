@@ -247,12 +247,3 @@ function getComplementary(colour) {
 module.exports = {
     populateDB, getNearestColour, hexStrToDec, generateGradient, getComplementary, miniPopulateDB
 };
-
-// TESTING CODE
-async function test() {
-    var target = "#ffaa00"
-    var hsl = RGB2HSL(target);
-    console.log(hsl[0], hsl[1], hsl[2])
-    var comp = getComplementary(target);
-}
-// test()

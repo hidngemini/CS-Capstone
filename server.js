@@ -36,9 +36,6 @@ app.post('/palettes', async (req, res) => {
   // unpack request
   const colours = req.body.colours;
 
-  // insert into db
-  // db.insertColour(colour);
-  
   // get nearest colour
   var textures = []
   var comps = []
